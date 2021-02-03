@@ -1,0 +1,12 @@
+
+.idea
+.DS_Store
+*.o
+*/run
+*/cmake-build-debug/
+*/run
+*.log
+output.csv
+/Coursework 1/Code/dla.csv
+run
+/Coursework 1/Code/dla.csv
