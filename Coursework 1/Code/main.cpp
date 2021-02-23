@@ -7,10 +7,10 @@
 
 using namespace std;
 
-#define width 100
-#define height 100
-#define numberOfWalkers 3000
-#define numberOfWalkerSteps 1000
+#define width 150
+#define height 150
+#define numberOfWalkers 1000
+#define numberOfWalkerSteps 5000
 #define stickingProbability 1.0
 #define outputFile "output/output.csv."
 
@@ -123,7 +123,7 @@ int main() {
     }
 
     // One particle at the centre
-    clusterGrid[width / 2][1] = 1;
+    clusterGrid[width / 2][height / 2] = 1;
 //    clusterGrid[20][20] = 1;
 
     // Output

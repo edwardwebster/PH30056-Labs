@@ -51,7 +51,7 @@ def calculate_fractal_dimension(datafile, start, stop, step, visual_output=False
 
     for n in range(start, stop, step):
         data[0].append(1 / n)
-        data[1].append(boxcount(datafile, n))
+        data[1].append(boxcount(datafile, n, visual_output))
 
     [m, c] = np.polyfit(np.log(data[0]), np.log(data[1]), 1)
 
@@ -66,4 +66,4 @@ def calculate_fractal_dimension(datafile, start, stop, step, visual_output=False
 
     return -m
 
-print(calculate_fractal_dimension("output.csv.67", 10, 40, 3))
+#print(calculate_fractal_dimension("output.csv.67", 10, 40, 3))
