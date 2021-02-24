@@ -12,7 +12,7 @@ using namespace std;
 #define numberOfWalkers 1000
 #define numberOfWalkerSteps 5000
 #define stickingProbability 1.0
-#define outputFile "output/output.csv."
+#define outputFile "../Data/DLA/output.csv."
 
 class walker {
 public:
