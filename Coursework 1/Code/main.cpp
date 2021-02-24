@@ -7,13 +7,13 @@
 
 using namespace std;
 
-#define width 400
-#define height 400
+#define width 600
+#define height 600
 #define depth 400
-#define numberOfWalkers 5000
-#define numberOfWalkerSteps 10000
+#define numberOfWalkers 15000
+#define numberOfWalkerSteps 15000
 #define stickingProbability 0.9
-#define outputFile "output/output.csv."
+#define outputFile "DLA-Single/output.csv."
 
 class walker {
 public:
@@ -75,7 +75,7 @@ void writeToCSV(int time, int grid[width][height]) {
     ofstream output;
     output.open(outputFile + to_string(time));
 
-    output << "x, y, z, state" << endl;
+    output << "x,y,z,state,r" << endl;
     // State = 1 for cluster
     // State = -1 for occupied
 
@@ -83,7 +83,7 @@ void writeToCSV(int time, int grid[width][height]) {
         for (int j = 0; j < height; j++) {
 
             if (grid[i][j] == 1) {
-                output << i << ", " << j << ", 0, 1" << endl;
+                output << i << ", " << j << ", 0, 1, " << sqrtf((i-width/2)*(i-width/2)+(j-height/2)*(j-height/2))+1 << endl;
             }
         }
     }
@@ -120,17 +120,21 @@ int main() {
     int time = 0;
     writeToCSV(time, clusterGrid);
 
-
+    int n = 0;
     for (auto &i : particleList) {
         for (time = 1; time < numberOfWalkerSteps; time++) {
             particle = &i;
             particle->takeRandomStep();
             if (particle->touchingCluster(clusterGrid)) {
                 clusterGrid[particle->x][particle->y] = 1;
+                writeToCSV(n, clusterGrid);
+                n++;
+                break;
             }
             //writeToCSV(time, clusterGrid); // Can either animate by particle step
         }
-        writeToCSV(time, clusterGrid); // Or animate by particle
+//        writeToCSV(n, clusterGrid); // Or animate by particle
+//        n++;
     }
     return 0;
 }

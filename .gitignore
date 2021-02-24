@@ -10,3 +10,7 @@ output.csv
 /Coursework 1/Code/dla.csv
 run
 /Coursework 1/Code/dla.csv
+**/output.csv.*
+.ipynb_checkpoints
+__pycache__
+Coursework 1 copy
