@@ -13,3 +13,4 @@ run
 **/output/
 *.csv
 *.csv
+**/output.csv.*
