@@ -1,4 +1,0 @@
-#!/bin/zsh
-
-jupyter nbconvert --to python Data.ipynb
-python3 Data.py

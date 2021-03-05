@@ -7,10 +7,10 @@
 
 using namespace std;
 
-#define width 150
-#define height 150
-#define numberOfWalkers 1000
-#define numberOfWalkerSteps 5000
+#define width 500
+#define height 500
+#define numberOfWalkers 5000
+#define numberOfWalkerSteps 10000
 #define stickingProbability 1.0
 #define outputFile "../Data/DLA/output.csv."
 

@@ -14,3 +14,6 @@ run
 *.csv
 *.csv
 **/output.csv.*
+**/cmake-build-debug/**
+**.csv.*
+*.pyc

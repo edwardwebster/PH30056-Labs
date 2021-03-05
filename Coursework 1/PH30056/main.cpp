@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     // this is the seed for the random numbers
     int seed = 5;
     dlaSystem->setSeed(seed);
-    dlaSystem->setStickingProbability(1.0);
+    dlaSystem->setStickingProbability(0.5);
 
     // print the "help" message to the console
     eventManager::introMessage();

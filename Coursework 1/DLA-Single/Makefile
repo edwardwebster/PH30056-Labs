@@ -10,11 +10,11 @@
 
 CXX     = clang++
 
-CXXFLAGS = -Wall -Wextra -g -O0 
+#CXXFLAGS = -Wall -Wextra -g -O0
 
-IFLAGS = -I/usr/local/include -I/usr/include
+#IFLAGS = -I/usr/local/include -I/usr/include
 
-LFLAGS = -L/usr/local/lib -lm -framework OpenGL -framework GLUT	
+#LFLAGS = -L/usr/local/lib -lm -framework OpenGL -framework GLUT
 
 # ------------------------------------------
 # FOR GENERIC MAKEFILE:

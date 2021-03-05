@@ -3,21 +3,30 @@
 //
 #include <iostream>
 #include <fstream>
+#include "cxxopts.hpp"
 #include "randomGenerator.h"
 
 using namespace std;
 
-#define width 600
-#define height 600
-#define depth 400
-#define numberOfWalkers 15000
-#define numberOfWalkerSteps 15000
-#define stickingProbability 0.9
-#define outputFile "DLA-Single/output.csv."
+//int width = 550;
+//int height = 550;
+int numberOfWalkers = 3000;
+int numberOfWalkerSteps=  20000;
+float stickingProbability = 0.5;
+string outputFolder = "../Data/DLA-Single/";
+string outputFilename = "output.csv.";
+bool verbose = true;
+
+#define width 500
+#define height 500
+//#define numberOfWalkers 3000
+//#define numberOfWalkerSteps 20000
+//#define stickingProbability 1.00
+//#define outputFile "../Data/DLA-Single/output.csv."
 
 class walker {
 public:
-    int x, y, z;
+    int x, y;
     bool active;
 
     bool touchingCluster(int cluster[width][height]) {
@@ -28,14 +37,18 @@ public:
         for (int k = -1; k <= 1; k++) {
             for (int l = -1; l <= 1; l++) {
 
-
-                if (x + k == 0 || x + k == width) return false;
-                if (y + l == 0 || y + l == height) return false;
+                if (x + k <= 0 || x + k >= width) return false;
+                if (y + l <= 0 || y + l >= height) return false;
 
                 // If clustered particle at position k or l
                 if (cluster[x + k][y + l] == 1) {
-                    active = false;
-                    return true;
+
+                    if (randomBetween(0, 10000) / 10000 < stickingProbability) {
+                        active = false;
+                        return true;
+                    } else {
+                    }
+
                 }
 
             }
@@ -48,8 +61,8 @@ public:
         // Update position by moving up, down, left or right
         if (not active) return;
 
-        x += randomBetween(-1, 1);
-        y += randomBetween(-1, 1);
+        x += int(randomBetween(-1, 1));
+        y += int(randomBetween(-1, 1));
         //z += randomBetween(-1, 1);
 
         // Cannot leave boundary
@@ -62,18 +75,15 @@ public:
     }
 
     walker() {
-        x = randomBetween(0, width - 1);
-        y = randomBetween(0, height - 1);
-        z = 0;
+        x = int(randomBetween(1, width - 1));
+        y = int(randomBetween(1, height - 1));
         active = true;
     };
 };
 
-walker particleList[numberOfWalkers];
-
 void writeToCSV(int time, int grid[width][height]) {
     ofstream output;
-    output.open(outputFile + to_string(time));
+    output.open(outputFolder + outputFilename + to_string(time));
 
     output << "x,y,z,state,r" << endl;
     // State = 1 for cluster
@@ -83,7 +93,8 @@ void writeToCSV(int time, int grid[width][height]) {
         for (int j = 0; j < height; j++) {
 
             if (grid[i][j] == 1) {
-                output << i << ", " << j << ", 0, 1, " << sqrtf((i-width/2)*(i-width/2)+(j-height/2)*(j-height/2))+1 << endl;
+                output << i << ", " << j << ", 0, 1, "
+                       << sqrt((i - width / 2.) * (i - width / 2.) + (j - height / 2.) * (j - height / 2.)) + 1 << endl;
             }
         }
     }
@@ -95,12 +106,49 @@ void writeToCSV(int time, int grid[width][height]) {
     output.close();
 }
 
-int main() {
+int main(int argc, char** argv) {
 
+    cxxopts::Options options("DLA Single", "Single particle simulation of Diffusion Limited Aggregation");
+    options.add_options()
+            ("h,help", "prints this message")
+            ("w,width", "width of the simulation grid (inactive)", cxxopts::value<int>()->default_value("500"))
+            ("l,length", "height of the simulation grid (inactive)", cxxopts::value<int>()->default_value("500"))
+            ("n,number", "number of simulated walkers", cxxopts::value<int>()->default_value("5000"))
+            ("s,steps", "number of walker steps", cxxopts::value<int>()->default_value("20000"))
+            ("p,probability", "sticking probability", cxxopts::value<float>()->default_value("1.0"))
+            ("o,outputfolder", "output folder", cxxopts::value<string>()->default_value("../../Data/DLA-Single/"))
+            ("f,outputfile", "output file names <filename>.csv.<timestep>", cxxopts::value<string>()->default_value("output.csv."))
+            ("v,verbose", "verbose output", cxxopts::value<bool>()->default_value("false"))
+            ;
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")){
+
+        cout << options.help() << endl;
+
+        return 0;
+    }
+
+//    width = result["width"].as<int>();
+//    height = result["length"].as<int>();
+    numberOfWalkers = result["number"].as<int>();
+    numberOfWalkerSteps = result["steps"].as<int>();
+    stickingProbability = result["probability"].as<float>();
+    outputFolder = result["outputfolder"].as<string>();
+    outputFilename = result["outputfile"].as<string>();
+    verbose = result["verbose"].as<bool>();
+
+    if (not verbose) {
+        cout << "Verbose Output" << endl;
+        cout << "Simulating " << numberOfWalkers << " particles taking " << numberOfWalkerSteps << " steps" << endl;
+        cout << "Sticking probability = " << stickingProbability << endl;
+        cout << "Data generated in " << outputFolder << outputFilename << "*" << endl;
+    } else if (verbose) {
+        printf("x,y,z,state,n");
+    }
     // Create walker
     walker *particle;
-
-    cout << "Simulating " << numberOfWalkers << " particles taking " << numberOfWalkerSteps << " steps" << endl;
 
     // Create clusterGrid to store particles in
     int clusterGrid[width][height];
@@ -120,19 +168,29 @@ int main() {
     int time = 0;
     writeToCSV(time, clusterGrid);
 
-    int n = 0;
-    for (auto &i : particleList) {
+    int n = 1;
+    while (n <= numberOfWalkers) {
+        particle = new walker;
         for (time = 1; time < numberOfWalkerSteps; time++) {
-            particle = &i;
             particle->takeRandomStep();
             if (particle->touchingCluster(clusterGrid)) {
-                clusterGrid[particle->x][particle->y] = 1;
-                writeToCSV(n, clusterGrid);
                 n++;
+                clusterGrid[particle->x][particle->y] = 1;
+
+                if (not verbose) {
+                    writeToCSV(n, clusterGrid);
+                } else if (verbose) {
+                    int x = particle->x;
+                    int y = particle->y;
+                    printf("%d,%d,0,1,%f,%d\n", x, y, sqrt((x - width / 2.) * (x - width / 2.) + (y - height / 2.) * (y - height / 2.)), n);
+                }
+
                 break;
             }
             //writeToCSV(time, clusterGrid); // Can either animate by particle step
+
         }
+        delete particle;
 //        writeToCSV(n, clusterGrid); // Or animate by particle
 //        n++;
     }
