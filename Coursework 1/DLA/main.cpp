@@ -9,10 +9,10 @@ using namespace std;
 
 #define width 500
 #define height 500
-#define numberOfWalkers 5000
-#define numberOfWalkerSteps 10000
+#define numberOfWalkers 6250
+#define numberOfWalkerSteps 50000
 #define stickingProbability 1.0
-#define outputFile "../Data/DLA/output.csv."
+#define outputFile "../../Data/DLA/output.csv."
 
 class walker {
 public:
@@ -28,8 +28,8 @@ public:
             for (int l = -1; l <= 1; l++) {
 
 
-                if (x+k==0||x+k==width) return false;
-                if (y+l==0||y+l==height) return false;
+                if (x + k <= 0 || x + k >= width) return false;
+                if (y + l <= 0 || y + l >= height) return false;
 
                 // If clustered particle at position k or l
                 if (cluster[x + k][y + l] == 1) {
@@ -63,15 +63,28 @@ public:
         //z += randomBetween(-1, 1);
 
         // Cannot leave boundary
-        if (x == 0) x++;
-        if (x == width) x--;
+//        if (x == 0) x++;
+//        if (x == width) x--;
+//
+//        if (y == 0) y++;
+//        if (y == height) y--;
 
-        if (y == 0) y++;
-        if (y == height) y--;
+        // Periodic boundary conditions instead
+        if (x <= 0) x = width - 1;
+        if (x >= width) x = 1;
+
+        if (y <= 0) y = height - 1;
+        if (y >= height) y = 1;
 
     }
 
     walker() {
+        x = randomBetween(0, width-1);
+        y = randomBetween(0, height-1);
+        active = true;
+    };
+
+    void reset() {
         x = randomBetween(0, width-1);
         y = randomBetween(0, height-1);
         active = true;
@@ -129,26 +142,34 @@ int main() {
     // Output
     int time = 0;
     writeToCSV(time, clusterGrid);
-
+    int n = 1;
 
     for (time = 1; time < numberOfWalkerSteps; time++) {
 //        cout << time << endl;
 
-        if (time % 100 == 0){
+        if (time % 1000 == 0){
             cout << time << endl;
         }
 
         for (auto & i : particleList) {
 //            cout << time << " " << particle.x << ", " << particle.y << endl;
             particle = &i;
-            particle->takeRandomStep();
-            if  (particle->touchingCluster(clusterGrid)){
-                clusterGrid[particle->x][particle->y] = 1;
-                //writeToCSV(time, clusterGrid); // Animate by growth
+            if (particle -> active) {
+                particle->takeRandomStep();
+                if  (particle->touchingCluster(clusterGrid)){
+                    clusterGrid[particle->x][particle->y] = 1;
+                    n++;
+                    writeToCSV(n, clusterGrid); // Animate by growth
+                    particle -> reset();
+                    if (particle->touchingCluster(clusterGrid)) particle -> active = false;
+                }
             }
         }
-        writeToCSV(time, clusterGrid); // Animation by time for all particles
+//        writeToCSV(time, clusterGrid); // Animation by time for all particles
     }
+
+    cout << "Cluster Size: " << n << endl;
+
 
     return 0;
 }

@@ -17,3 +17,4 @@ run
 **/cmake-build-debug/**
 **.csv.*
 *.pyc
+/Coursework 1/Report/Figures/Animation/**

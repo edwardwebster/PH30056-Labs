@@ -13,25 +13,25 @@ class DLA():
         start_time = time.time()
         process = subprocess.Popen(["../DLA-Single/cmake-build-debug/DLA-Single",
                                     "-v",
-                                    "-n", str(self.number_of_walkers),
+                                    "-size", str(self.number_of_walkers),
                                     "-s", str(self.number_of_steps),
                                     "-p", str(self.sticking_probability)],
                                    stdout=subprocess.PIPE)
         output = process.stdout.read().split()
         self.time = time.time() - start_time
         data = np.loadtxt(output, delimiter=',', skiprows=1)
-        self.data = pd.DataFrame(data, columns=["x", "y", "z", "state", "r", "n"]).sort_values(by="n")
+        self.data = pd.DataFrame(data, columns=["x", "y", "z", "state", "r", "size"]).sort_values(by="size")
         self.data["r"] = self.data["r"] - min(self.data["r"])
         print(f"Simulation generated in {self.time:.2f} seconds")
 
     def boxcount(self, N, visual_output=False):
-        # filter = self.data["state"] == 1
+        filter = self.data["state"] == 1
 
-        x = self.data["x"]
-        y = self.data["y"]
+        # x = self.data["x"]
+        # y = self.data["y"]
 
-        # x = self.data["x"][filter]
-        # y = self.data["y"][filter]
+        x = self.data["x"][filter]
+        y = self.data["y"][filter]
 
         # Minimum and maximums
         xmax = max(x) + 0.00001
@@ -152,7 +152,7 @@ def fractal_dimension(datafile, start, stop, step, visual_output=False, boxcount
         data[0].append(1 / n)
         data[1].append(box_count(datafile, n, boxcount_visual))
 
-    [m, c] = np.polyfit(np.log(data[0]), np.log(data[1]), 1)
+    [m, c], cov = np.polyfit(np.log(data[0]), np.log(data[1]), 1, cov=True)
 
     if visual_output:
         # calculate_fractal_dimension(datafile, 1, 100, 10, visual_output=True, boxcount_visual=False)
@@ -165,4 +165,4 @@ def fractal_dimension(datafile, start, stop, step, visual_output=False, boxcount
         plt.plot(x, y, color="red")
         plt.show()
 
-    return -m
+    return [-m, np.sqrt(cov[0,0])]
