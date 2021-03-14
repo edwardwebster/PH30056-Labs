@@ -9,10 +9,10 @@ using namespace std;
 
 #define width 500
 #define height 500
-#define numberOfWalkers 6250
-#define numberOfWalkerSteps 50000
+#define numberOfWalkers 5000
+#define numberOfWalkerSteps 10000
 #define stickingProbability 1.0
-#define outputFile "../../Data/DLA/output.csv."
+#define outputFile "../../Data/Extra/output.csv."
 
 class walker {
 public:
@@ -63,11 +63,11 @@ public:
         //z += randomBetween(-1, 1);
 
         // Cannot leave boundary
-//        if (x == 0) x++;
-//        if (x == width) x--;
+//        if (x <= 0) x++;
+//        if (x >= width) x--;
 //
-//        if (y == 0) y++;
-//        if (y == height) y--;
+//        if (y <= 0) y++;
+//        if (y >= height) y--;
 
         // Periodic boundary conditions instead
         if (x <= 0) x = width - 1;
@@ -97,7 +97,7 @@ void writeToCSV(int time, int grid[width][height]) {
     ofstream output;
     output.open(outputFile + to_string(time));
 
-    output << "x, y, z, state" << endl;
+    output << "x,y,z,state" << endl;
     // State = 1 for cluster
     // State = -1 for occupied
 
@@ -138,6 +138,8 @@ int main() {
     // One particle at the centre
     clusterGrid[width / 2][height / 2] = 1;
 //    clusterGrid[20][20] = 1;
+//    clusterGrid[480][480] = 1;
+
 
     // Output
     int time = 0;
@@ -159,14 +161,16 @@ int main() {
                 if  (particle->touchingCluster(clusterGrid)){
                     clusterGrid[particle->x][particle->y] = 1;
                     n++;
-                    writeToCSV(n, clusterGrid); // Animate by growth
+//                    writeToCSV(n, clusterGrid); // Animate by growth
                     particle -> reset();
                     if (particle->touchingCluster(clusterGrid)) particle -> active = false;
                 }
             }
         }
-//        writeToCSV(time, clusterGrid); // Animation by time for all particles
+        writeToCSV(time, clusterGrid); // Animation by time for all particles
     }
+
+//    writeToCSV(time, clusterGrid); // Animation by time for all particles
 
     cout << "Cluster Size: " << n << endl;
 
