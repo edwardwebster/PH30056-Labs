@@ -44,8 +44,6 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # ------------------------------------------
 all : $(BIN)/run
 
-test: $(BIN)/hllc_test
-
 help :
 	@grep -E "^# !" Makefile | sed -e 's/# !/ /g'
 
