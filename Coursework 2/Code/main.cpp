@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
 
     int window_size[] = {480, 480};
-    string window_title("simple Ising simulation");
+    string window_title("Simple Ising simulation");
 
     Window *win = new Window(window_size, window_title);
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     cout << seed << endl;
     sys->setSeed(seed);
 
-    int temperature;
+    float temperature;
     cout << "Input Temperature: ";
     cin >> temperature;
     cout << temperature << endl;

@@ -26,11 +26,12 @@ IsingSystem::IsingSystem(Window *set_win) {
     numberOfSteps = 0;
 
     // Open the logfile
-
-    logfile.open("output.csv");
-    logfile << gridSize << ',' << gridSize << endl;
-    logfile << inverseTemperatureBeta << endl;
-    logfile << "time,energy,magnetisation\n";
+//    string filename = "../Data/" + to_string(inverseTemperatureBeta) + ".csv";
+//    logfile.open(filename);
+//    logfile.open("../Data/output.csv");
+//    logfile << "Grid Size: " << gridSize << ',' << gridSize << endl;
+//    logfile << "Inverse temperature: " << inverseTemperatureBeta << endl;
+//    logfile << "time,energy,magnetisation\n";
 
     // Allocate memory for the grid, remember to free the memory in destructor
     //   the point here is that each row of the grid is an array
@@ -144,6 +145,10 @@ void IsingSystem::attemptSpinFlip() {
     double dE = 2.0 * hloc * readGrid(pos);
     if (dE < 0)
         flipSpin(pos);
+
+    // TODO - This wasn't multiplied by inverseTemperatureBeta
+    //        Ask why it wasn't in class
+//    else if (rgen.random01() < exp(-dE * inverseTemperatureBeta))
     else if (rgen.random01() < exp(-dE))
         flipSpin(pos);
 
@@ -204,8 +209,21 @@ void IsingSystem::setPosNeighbour(int setpos[], int pos[], int val) {
 void IsingSystem::Update() {
     numberOfSteps += 1;
 
-    if (numberOfSteps % 10 == 0 && numberOfSteps > 0) {
-        logfile << numberOfSteps << ',' << getSystemEnergy() << ',' << getSystemMagnetisation() << endl;
+    if (numberOfSteps % 1 == 0 && numberOfSteps > 0) {
+        logfile << numberOfSteps << ',' << inverseTemperatureBeta << ',' << getSystemEnergy() << ',' << getSystemMagnetisation()
+            << ',' << correlation(25, 25, 26, 26)
+            << ','<< correlation(25, 25, 37, 37)
+            << ',' << correlation(25, 25, 49, 49) << endl;
+//        logfile << numberOfSteps << ',' << inverseTemperatureBeta << ',' << getSystemEnergy() << ',' << getSystemMagnetisation() << endl;
+    }
+
+    if (numberOfSteps % 1000 == 0) {
+        cout << "Steps taken:\t" << numberOfSteps << endl;
+    }
+
+    if (numberOfSteps % 1000 == 0) {
+        inverseTemperatureBeta -= 0.025;
+//        cout << "Temperature: " << inverseTemperatureBeta << endl;
     }
 
     MCsweep();
@@ -222,11 +240,11 @@ double IsingSystem::getSystemEnergy() {
             // position is (i,j)
             int pos[2] = {i, j};
             // set this spin to state -1
-            systemEnergy += computeLocalField(pos);
+            systemEnergy += computeLocalField(pos)*readGrid(pos);
         }
     }
 
-    systemEnergy /= gridSize*gridSize;
+    systemEnergy /= 2*gridSize*gridSize;
 
     return systemEnergy;
 }
@@ -290,6 +308,29 @@ double IsingSystem::getMagneticSusceptibility() {
 
     return averageSquaredMagnetism;
 
+}
+
+void IsingSystem::setRunning() {
+    isActive = 1;
+    string filename = "/Users/Edward/OneDrive - University of Bath/Physics/Year 3/Semester 2/Comp B/Labs/Coursework 2/Data/" + to_string(inverseTemperatureBeta) + ".csv";
+    logfile.open(filename);
+//        logfile.open("../Data/output.csv");
+    logfile << "Grid Size: " << gridSize << ',' << gridSize << endl;
+    logfile << "Inverse temperature: " << inverseTemperatureBeta << endl;
+    logfile << "time,beta,energy,magnetisation,cor1,cor2,cor3\n";
+}
+
+void IsingSystem::pauseRunning() {
+    isActive = 0;
+    logfile.close();
+}
+
+int IsingSystem::correlation(int x1, int y1, int x2, int y2) {
+
+    int pos1[2] = {x1, y1};
+    int pos2[2] = {x2, y2};
+
+    return readGrid(pos1)*readGrid(pos2);
 }
 
 #pragma clang diagnostic pop

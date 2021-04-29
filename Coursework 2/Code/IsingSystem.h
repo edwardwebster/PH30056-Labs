@@ -82,9 +82,9 @@ public:
     // "user interface" for the isActive variable
     int isRunning() { return isActive; }
 
-    void setRunning() { isActive = 1; }
+    void setRunning();
 
-    void pauseRunning() { isActive = 0; }
+    void pauseRunning();
 
     // "user interface" for the slowNotFast variable
     int isSlow() { return slowNotFast; }
@@ -118,5 +118,7 @@ public:
     double getHeatCapacity();
 
     double getMagneticSusceptibility();
+
+    int correlation(int x1, int y1, int x2, int y2);
 };
 
