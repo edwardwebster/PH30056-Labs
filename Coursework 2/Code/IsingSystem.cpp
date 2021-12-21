@@ -221,8 +221,8 @@ void IsingSystem::Update() {
         cout << "Steps taken:\t" << numberOfSteps << endl;
     }
 
-    if (numberOfSteps % 1000 == 0) {
-        inverseTemperatureBeta -= 0.025;
+    if (numberOfSteps % 250 == 0) {
+        inverseTemperatureBeta += 0.025;
 //        cout << "Temperature: " << inverseTemperatureBeta << endl;
     }
 
